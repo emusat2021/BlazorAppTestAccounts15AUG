@@ -1,0 +1,49 @@
+﻿@page "/webpages/details"
+
+@using Microsoft.EntityFrameworkCore
+@using BlazorAppTestAccounts15AUG.Models
+@inject IDbContextFactory<BlazorAppTestAccounts15AUG.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>WebPage</h4>
+    <hr />
+    @if (webpage is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@webpage.Name</dd>
+            <dt class="col-sm-2">Create</dt>
+            <dd class="col-sm-10">@webpage.Create</dd>
+        </dl>
+        <div>
+            <a href="@($"/webpages/edit?id={webpage.Id}")">Edit</a> |
+            <a href="@($"/webpages")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    WebPage? webpage;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        webpage = await context.WebPage.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (webpage is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}
